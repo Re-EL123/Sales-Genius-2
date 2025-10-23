@@ -5,6 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Products</title>
 <link rel="stylesheet" href="css/style.css">
+<style>
+body { font-family: Arial, sans-serif; background:#e0f7ff; margin:0; padding:0; }
+header { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:#00bfff; color:white; }
+header a { color:white; text-decoration:none; font-weight:bold; }
+main { padding:20px; max-width:800px; margin:auto; }
+#product-form { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; background:#f0faff; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+#product-form input { flex:1 1 200px; padding:10px; border-radius:5px; border:1px solid #ccc; }
+#product-form button { padding:10px 20px; background:#00bfff; color:white; border:none; border-radius:5px; cursor:pointer; transition:0.3s; }
+#product-form button:hover { background:#009acd; transform:scale(1.05); }
+table { width:100%; border-collapse:collapse; margin-top:15px; }
+th, td { border:1px solid #ccc; padding:8px; text-align:center; }
+button.action-btn { padding:5px 10px; background:#00bfff; color:white; border:none; border-radius:5px; cursor:pointer; transition:0.3s; }
+button.action-btn:hover { background:#009acd; transform:scale(1.05); }
+</style>
 </head>
 <body>
 <header>
@@ -15,13 +29,13 @@
 <main>
     <form id="product-form">
         <input type="text" id="product-name" placeholder="Product Name" required>
-        <input type="number" id="product-price" placeholder="Price" required>
+        <input type="number" id="product-price" placeholder="Price (R)" required>
         <button type="submit">Add Product</button>
     </form>
 
     <table>
         <thead>
-            <tr><th>Name</th><th>Price</th><th>Action</th></tr>
+            <tr><th>Name</th><th>Price (R)</th><th>Action</th></tr>
         </thead>
         <tbody id="product-list"></tbody>
     </table>
