@@ -64,6 +64,131 @@ th, td { border:1px solid #ccc; padding:5px; text-align:center; }
     <button id="checkout-btn">Checkout</button>
 </main>
 
-<script src="js/sales.js"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBLD-z9z2Le8DAqYobMkd2kwurgI9B69rY",
+  authDomain: "sales-genius-a.firebaseapp.com",
+  projectId: "sales-genius-a",
+  storageBucket: "sales-genius-a.firebasestorage.app",
+  messagingSenderId: "443916526137",
+  appId: "1:443916526137:web:87f76fa73b0a578b17a3e8",
+  measurementId: "G-M9C615D3J5"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+// Redirect to index if not signed in
+auth.onAuthStateChanged(user => {
+  if (!user) {
+    window.location.href = "index.html";
+  }
+});
+
+// Sample products for demo
+const products = [
+  { name: "Laptop", price: 12000 },
+  { name: "Mouse", price: 250 },
+  { name: "Keyboard", price: 400 },
+  { name: "Monitor", price: 3000 },
+  { name: "Printer", price: 2800 }
+];
+
+const cart = [];
+
+const productButtonsDiv = document.getElementById("product-buttons");
+const cartList = document.getElementById("cart-list");
+const totalEl = document.getElementById("total");
+
+// Display product buttons
+products.forEach(p => {
+  const btn = document.createElement("button");
+  btn.textContent = `${p.name} - R${p.price}`;
+  btn.onclick = () => addToCart(p);
+  productButtonsDiv.appendChild(btn);
+});
+
+function addToCart(product) {
+  const existing = cart.find(item => item.name === product.name);
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({ ...product, qty: 1 });
+  }
+  renderCart();
+}
+
+function renderCart() {
+  cartList.innerHTML = "";
+  let total = 0;
+  cart.forEach((item, index) => {
+    const row = document.createElement("tr");
+    const totalPrice = item.price * item.qty;
+    total += totalPrice;
+    row.innerHTML = `
+      <td>${item.name}</td>
+      <td>${item.price}</td>
+      <td>${item.qty}</td>
+      <td>${totalPrice}</td>
+      <td><button onclick="removeFromCart(${index})">Remove</button></td>
+    `;
+    cartList.appendChild(row);
+  });
+  totalEl.textContent = total.toFixed(2);
+}
+
+function removeFromCart(index) {
+  cart.splice(index, 1);
+  renderCart();
+}
+
+// Checkout button
+document.getElementById("checkout-btn").addEventListener("click", () => {
+  if (cart.length === 0) {
+    alert("Cart is empty!");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  const email = document.getElementById("customer-email").value || "N/A";
+  const whatsapp = document.getElementById("customer-whatsapp").value || "N/A";
+  const payment = document.getElementById("payment-method").value;
+  const customerType = document.getElementById("customer-type").value;
+
+  let y = 20;
+  doc.setFontSize(16);
+  doc.text("Sales Genius - Receipt", 14, y);
+  doc.setFontSize(10);
+  doc.text(`Customer Type: ${customerType}`, 14, y + 10);
+  doc.text(`Email: ${email}`, 14, y + 16);
+  doc.text(`WhatsApp: ${whatsapp}`, 14, y + 22);
+  doc.text(`Payment: ${payment}`, 14, y + 28);
+  doc.text(`Date: ${new Date().toLocaleString()}`, 14, y + 34);
+  y += 45;
+
+  doc.setFontSize(12);
+  doc.text("Items:", 14, y);
+  y += 8;
+
+  cart.forEach(item => {
+    doc.text(`${item.name}  x${item.qty}  -  R${(item.price * item.qty).toFixed(2)}`, 14, y);
+    y += 6;
+  });
+
+  doc.setFontSize(14);
+  y += 10;
+  doc.text(`Total: R${totalEl.textContent}`, 14, y);
+
+  doc.save(`Receipt_${Date.now()}.pdf`);
+  alert("Receipt generated successfully!");
+});
+</script>
 </body>
 </html>
