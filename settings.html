@@ -6,96 +6,167 @@
 <title>Sales Genius - Settings</title>
 <link rel="stylesheet" href="css/style.css">
 <style>
-body { font-family: Arial, sans-serif; margin:0; padding:0; background:#e0f7ff; }
-header { background:#00bfff; color:white; padding:15px; display:flex; justify-content:space-between; align-items:center; }
+body {
+  font-family: Arial, sans-serif;
+  margin:0;
+  padding:0;
+  background: var(--bg, #e0f7ff);
+  color: var(--text, #000);
+  transition: background 0.3s, color 0.3s;
+}
+header {
+  background: var(--primary, #00bfff);
+  color:white;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 header h1 { margin:0; font-size:24px; }
-header a { color:white; text-decoration:none; font-weight:bold; }
-main { max-width:600px; margin:auto; padding:20px; display:flex; flex-direction:column; gap:20px; }
-.settings-box { background:white; padding:20px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.2); display:flex; flex-direction:column; gap:15px; }
-.settings-box h2 { margin:0; color:#00bfff; }
+header a {
+  color:white;
+  text-decoration:none;
+  font-weight:bold;
+  background:rgba(255,255,255,0.2);
+  padding:6px 10px;
+  border-radius:6px;
+  transition:0.3s;
+}
+header a:hover { background:rgba(255,255,255,0.3); }
+
+main {
+  max-width:600px;
+  margin:auto;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+.settings-box {
+  background: var(--card, white);
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.15);
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+.settings-box h2 { margin:0; color: var(--primary, #00bfff); }
 .settings-box label { font-weight:bold; margin-bottom:5px; }
-.settings-box input, .settings-box select { padding:10px; border-radius:5px; border:1px solid #ccc; width:100%; }
-.settings-box button { padding:10px; border:none; border-radius:5px; background:#00bfff; color:white; font-weight:bold; cursor:pointer; transition:0.3s; }
+.settings-box input,
+.settings-box select {
+  padding:10px;
+  border-radius:5px;
+  border:1px solid #ccc;
+  width:100%;
+}
+.settings-box button {
+  padding:10px;
+  border:none;
+  border-radius:5px;
+  background: var(--primary, #00bfff);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.3s;
+}
 .settings-box button:hover { background:#009acd; transform:scale(1.05); }
 </style>
 </head>
 <body>
 <header>
-    <h1>Settings</h1>
-    <a href="dashboard.html">Back</a>
+  <h1>Settings</h1>
+  <a href="dashboard.html">Back</a>
 </header>
 
 <main>
-    <!-- Update Account Info -->
-    <div class="settings-box">
-        <h2>Account Information</h2>
-        <label for="username">Username</label>
-        <input type="text" id="username" placeholder="Enter your username">
-        <label for="email">Email</label>
-        <input type="email" id="email" placeholder="Enter your email">
-        <button id="update-account">Update Account</button>
-    </div>
+  <!-- Account Info -->
+  <div class="settings-box">
+    <h2>Account Information</h2>
+    <label for="username">Username</label>
+    <input type="text" id="username" placeholder="Enter your username">
+    <label for="email">Email</label>
+    <input type="email" id="email" placeholder="Enter your email">
+    <button id="update-account">Update Account</button>
+  </div>
 
-    <!-- Change Password -->
-    <div class="settings-box">
-        <h2>Change Password</h2>
-        <label for="current-password">Current Password</label>
-        <input type="password" id="current-password" placeholder="Current Password">
-        <label for="new-password">New Password</label>
-        <input type="password" id="new-password" placeholder="New Password">
-        <button id="change-password">Change Password</button>
-    </div>
+  <!-- Password -->
+  <div class="settings-box">
+    <h2>Change Password</h2>
+    <label for="current-password">Current Password</label>
+    <input type="password" id="current-password" placeholder="Current Password">
+    <label for="new-password">New Password</label>
+    <input type="password" id="new-password" placeholder="New Password">
+    <button id="change-password">Change Password</button>
+  </div>
 
-    <!-- Theme Preference -->
-    <div class="settings-box">
-        <h2>Theme Preference</h2>
-        <label for="theme-select">Select Theme</label>
-        <select id="theme-select">
-            <option value="skyblue">Sky Blue</option>
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-        </select>
-        <button id="save-theme">Save Theme</button>
-    </div>
+  <!-- Theme -->
+  <div class="settings-box">
+    <h2>Theme Preference</h2>
+    <label for="theme-select">Select Theme</label>
+    <select id="theme-select">
+      <option value="skyblue">Sky Blue</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+    <button id="save-theme">Save Theme</button>
+  </div>
 </main>
 
 <script>
-// Load user data from localStorage
+// --- Load current user data ---
 const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
 document.getElementById('username').value = currentUser.username || '';
 document.getElementById('email').value = currentUser.email || '';
 
-// Update account info
+// --- Account Update ---
 document.getElementById('update-account').addEventListener('click', () => {
-    currentUser.username = document.getElementById('username').value;
-    currentUser.email = document.getElementById('email').value;
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    alert('Account information updated!');
+  currentUser.username = document.getElementById('username').value;
+  currentUser.email = document.getElementById('email').value;
+  localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  alert('✅ Account information updated!');
 });
 
-// Change password
+// --- Change Password ---
 document.getElementById('change-password').addEventListener('click', () => {
-    const currentPass = document.getElementById('current-password').value;
-    const newPass = document.getElementById('new-password').value;
-    if(currentPass === currentUser.password || !currentUser.password){
-        currentUser.password = newPass;
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        alert('Password updated successfully!');
-        document.getElementById('current-password').value = '';
-        document.getElementById('new-password').value = '';
-    } else {
-        alert('Current password is incorrect!');
-    }
+  const currentPass = document.getElementById('current-password').value;
+  const newPass = document.getElementById('new-password').value;
+  if (currentPass === currentUser.password || !currentUser.password) {
+    currentUser.password = newPass;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    alert('✅ Password changed successfully!');
+    document.getElementById('current-password').value = '';
+    document.getElementById('new-password').value = '';
+  } else {
+    alert('❌ Incorrect current password.');
+  }
 });
 
-// Theme selection
+// --- Theme System ---
 const themeSelect = document.getElementById('theme-select');
-themeSelect.addEventListener('change', () => {
-    document.body.style.background = themeSelect.value === 'skyblue' ? '#e0f7ff' :
-                                     themeSelect.value === 'light' ? '#f9f9f9' :
-                                     '#1a1a1a';
-    document.body.style.color = themeSelect.value === 'dark' ? 'white' : 'black';
+const savedTheme = localStorage.getItem('theme') || 'skyblue';
+themeSelect.value = savedTheme;
+applyTheme(savedTheme);
+
+themeSelect.addEventListener('change', e => applyTheme(e.target.value));
+document.getElementById('save-theme').addEventListener('click', () => {
+  const selectedTheme = themeSelect.value;
+  localStorage.setItem('theme', selectedTheme);
+  applyTheme(selectedTheme);
+  alert('🎨 Theme saved!');
 });
+
+function applyTheme(theme) {
+  let vars = {};
+  if (theme === 'skyblue') {
+    vars = { '--bg': '#e0f7ff', '--primary': '#00bfff', '--text': '#000', '--card': '#fff' };
+  } else if (theme === 'light') {
+    vars = { '--bg': '#f9f9f9', '--primary': '#2196f3', '--text': '#000', '--card': '#fff' };
+  } else if (theme === 'dark') {
+    vars = { '--bg': '#1a1a1a', '--primary': '#00bfff', '--text': '#fff', '--card': '#2a2a2a' };
+  }
+  for (const [k, v] of Object.entries(vars)) document.documentElement.style.setProperty(k, v);
+}
 </script>
 </body>
 </html>
