@@ -41,6 +41,90 @@ button.action-btn:hover { background:#009acd; transform:scale(1.05); }
     </table>
 </main>
 
-<script src="js/products.js"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBLD-z9z2Le8DAqYobMkd2kwurgI9B69rY",
+  authDomain: "sales-genius-a.firebaseapp.com",
+  projectId: "sales-genius-a",
+  storageBucket: "sales-genius-a.firebasestorage.app",
+  messagingSenderId: "443916526137",
+  appId: "1:443916526137:web:87f76fa73b0a578b17a3e8",
+  measurementId: "G-M9C615D3J5"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Redirect if not logged in
+auth.onAuthStateChanged(user => {
+  if (!user) window.location.href = "index.html";
+});
+
+// Elements
+const form = document.getElementById("product-form");
+const nameInput = document.getElementById("product-name");
+const priceInput = document.getElementById("product-price");
+const productList = document.getElementById("product-list");
+
+// Add product
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = nameInput.value.trim();
+  const price = parseFloat(priceInput.value);
+
+  if (!name || !price || price <= 0) {
+    alert("Please enter valid product details.");
+    return;
+  }
+
+  try {
+    await db.collection("products").add({
+      name,
+      price,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    form.reset();
+    alert("✅ Product added successfully!");
+  } catch (error) {
+    console.error("Error adding product:", error);
+    alert("❌ Failed to add product.");
+  }
+});
+
+// Real-time product list
+db.collection("products").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+  productList.innerHTML = "";
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${data.name}</td>
+      <td>R${data.price.toFixed(2)}</td>
+      <td><button class="action-btn" onclick="deleteProduct('${doc.id}')">Delete</button></td>
+    `;
+    productList.appendChild(tr);
+  });
+});
+
+// Delete product
+async function deleteProduct(id) {
+  if (confirm("Are you sure you want to delete this product?")) {
+    try {
+      await db.collection("products").doc(id).delete();
+      alert("🗑️ Product deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      alert("❌ Failed to delete product.");
+    }
+  }
+}
+</script>
 </body>
 </html>
