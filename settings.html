@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Genius - Settings</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+body { font-family: Arial, sans-serif; margin:0; padding:0; background:#e0f7ff; }
+header { background:#00bfff; color:white; padding:15px; display:flex; justify-content:space-between; align-items:center; }
+header h1 { margin:0; font-size:24px; }
+header a { color:white; text-decoration:none; font-weight:bold; }
+main { max-width:600px; margin:auto; padding:20px; display:flex; flex-direction:column; gap:20px; }
+.settings-box { background:white; padding:20px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.2); display:flex; flex-direction:column; gap:15px; }
+.settings-box h2 { margin:0; color:#00bfff; }
+.settings-box label { font-weight:bold; margin-bottom:5px; }
+.settings-box input, .settings-box select { padding:10px; border-radius:5px; border:1px solid #ccc; width:100%; }
+.settings-box button { padding:10px; border:none; border-radius:5px; background:#00bfff; color:white; font-weight:bold; cursor:pointer; transition:0.3s; }
+.settings-box button:hover { background:#009acd; transform:scale(1.05); }
+</style>
+</head>
+<body>
+<header>
+    <h1>Settings</h1>
+    <a href="dashboard.html">Back</a>
+</header>
+
+<main>
+    <!-- Update Account Info -->
+    <div class="settings-box">
+        <h2>Account Information</h2>
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Enter your username">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="Enter your email">
+        <button id="update-account">Update Account</button>
+    </div>
+
+    <!-- Change Password -->
+    <div class="settings-box">
+        <h2>Change Password</h2>
+        <label for="current-password">Current Password</label>
+        <input type="password" id="current-password" placeholder="Current Password">
+        <label for="new-password">New Password</label>
+        <input type="password" id="new-password" placeholder="New Password">
+        <button id="change-password">Change Password</button>
+    </div>
+
+    <!-- Theme Preference -->
+    <div class="settings-box">
+        <h2>Theme Preference</h2>
+        <label for="theme-select">Select Theme</label>
+        <select id="theme-select">
+            <option value="skyblue">Sky Blue</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+        </select>
+        <button id="save-theme">Save Theme</button>
+    </div>
+</main>
+
+<script>
+// Load user data from localStorage
+const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
+document.getElementById('username').value = currentUser.username || '';
+document.getElementById('email').value = currentUser.email || '';
+
+// Update account info
+document.getElementById('update-account').addEventListener('click', () => {
+    currentUser.username = document.getElementById('username').value;
+    currentUser.email = document.getElementById('email').value;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    alert('Account information updated!');
+});
+
+// Change password
+document.getElementById('change-password').addEventListener('click', () => {
+    const currentPass = document.getElementById('current-password').value;
+    const newPass = document.getElementById('new-password').value;
+    if(currentPass === currentUser.password || !currentUser.password){
+        currentUser.password = newPass;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        alert('Password updated successfully!');
+        document.getElementById('current-password').value = '';
+        document.getElementById('new-password').value = '';
+    } else {
+        alert('Current password is incorrect!');
+    }
+});
+
+// Theme selection
+const themeSelect = document.getElementById('theme-select');
+themeSelect.addEventListener('change', () => {
+    document.body.style.background = themeSelect.value === 'skyblue' ? '#e0f7ff' :
+                                     themeSelect.value === 'light' ? '#f9f9f9' :
+                                     '#1a1a1a';
+    document.body.style.color = themeSelect.value === 'dark' ? 'white' : 'black';
+});
+</script>
+</body>
+</html>
