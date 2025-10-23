@@ -3,49 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>POS Dashboard</title>
+<title>Sales Genius by Re-EL - Dashboard</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/dashboard.css">
 <!-- Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-.cards {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    margin-top: 30px;
-}
-.card {
-    flex: 1 1 200px;
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    text-decoration: none;
-    color: #333;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    transition: 0.3s;
-}
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-}
-.card i {
-    font-size: 36px;
-    color: #4CAF50;
-    margin-bottom: 10px;
-}
-.card .count {
-    display: block;
-    font-size: 24px;
-    font-weight: bold;
-    margin-top: 5px;
+body { font-family: Arial, sans-serif; background:#e0f7ff; margin:0; padding:0; }
+header { background:#00bfff; color:white; padding:15px; display:flex; justify-content:space-between; align-items:center; }
+header h1 { margin:0; font-size:24px; }
+header button { padding:10px 20px; background:#009acd; border:none; border-radius:5px; color:white; cursor:pointer; transition:0.3s; }
+header button:hover { background:#007bb5; transform:scale(1.05); }
+.cards { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; margin-top:30px; }
+.card { flex:1 1 200px; background:#ffffff; padding:20px; border-radius:12px; text-align:center; text-decoration:none; color:#333; box-shadow:0 2px 10px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; display:flex; flex-direction:column; align-items:center; }
+.card:hover { transform: translateY(-5px) scale(1.05); box-shadow:0 6px 20px rgba(0,0,0,0.2); }
+.card i { font-size:40px; color:#00bfff; margin-bottom:10px; animation:bounce 2s infinite; }
+.card .count { display:block; font-size:24px; font-weight:bold; margin-top:5px; color:#00bfff; }
+@keyframes bounce {
+  0%,20%,50%,80%,100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
 }
 </style>
 </head>
 <body>
 <header>
-    <h1>POS Dashboard</h1>
+    <h1>Sales Genius by Re-EL</h1>
     <button id="logout-btn">Logout</button>
 </header>
 <main>
@@ -79,7 +62,6 @@ document.getElementById('logout-btn').addEventListener('click', () => {
 // Get totals
 const products = JSON.parse(localStorage.getItem('products')) || [];
 const sales = JSON.parse(localStorage.getItem('sales')) || [];
-
 document.getElementById('total-products').textContent = products.length;
 document.getElementById('total-sales').textContent = sales.length;
 </script>
