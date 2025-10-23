@@ -6,6 +6,42 @@
 <title>POS Dashboard</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/dashboard.css">
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+.cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+.card {
+    flex: 1 1 200px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    text-decoration: none;
+    color: #333;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+.card i {
+    font-size: 36px;
+    color: #4CAF50;
+    margin-bottom: 10px;
+}
+.card .count {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+</style>
 </head>
 <body>
 <header>
@@ -14,19 +50,38 @@
 </header>
 <main>
     <div class="cards">
-        <a href="products.html" class="card">Manage Products</a>
-        <a href="sales.html" class="card">POS & Sales</a>
-        <a href="reports.html" class="card">Reports</a>
+        <a href="products.html" class="card">
+            <i class="fas fa-boxes"></i>
+            Manage Products
+            <span class="count" id="total-products">0</span>
+        </a>
+        <a href="sales.html" class="card">
+            <i class="fas fa-cash-register"></i>
+            POS & Sales
+            <span class="count" id="total-sales">0</span>
+        </a>
+        <a href="reports.html" class="card">
+            <i class="fas fa-chart-line"></i>
+            Reports
+        </a>
     </div>
 </main>
 
 <script>
 const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 if (!currentUser) window.location.href = 'index.html';
+
 document.getElementById('logout-btn').addEventListener('click', () => {
     localStorage.removeItem('currentUser');
     window.location.href = 'index.html';
 });
+
+// Get totals
+const products = JSON.parse(localStorage.getItem('products')) || [];
+const sales = JSON.parse(localStorage.getItem('sales')) || [];
+
+document.getElementById('total-products').textContent = products.length;
+document.getElementById('total-sales').textContent = sales.length;
 </script>
 </body>
 </html>
