@@ -3,21 +3,107 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reports</title>
+<title>Sales Reports</title>
 <link rel="stylesheet" href="css/style.css">
+<style>
+main { padding:20px; max-width:1000px; margin:auto; }
+header { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:#00bfff; color:white; }
+header a { color:white; text-decoration:none; font-weight:bold; }
+.filters { display:flex; gap:10px; flex-wrap:wrap; margin:20px 0; }
+.filters select, .filters button { padding:8px 12px; border-radius:5px; border:1px solid #ccc; cursor:pointer; }
+.filters button { background:#00bfff; color:white; border:none; transition:0.3s; }
+.filters button:hover { background:#009acd; transform:scale(1.05); }
+table { width:100%; border-collapse:collapse; margin-top:15px; }
+th, td { border:1px solid #ccc; padding:5px; text-align:center; }
+.best-product { margin-top:20px; font-weight:bold; color:#00bfff; }
+</style>
 </head>
 <body>
 <header>
     <h1>Sales Reports</h1>
     <a href="dashboard.html">Back</a>
 </header>
+
 <main>
+    <div class="filters">
+        <label>Filter by: 
+            <select id="report-period">
+                <option value="daily">Daily</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+            </select>
+        </label>
+        <button id="export-csv">Export CSV</button>
+    </div>
+
     <table>
-        <thead><tr><th>Date</th><th>Items</th><th>Total</th></tr></thead>
+        <thead>
+            <tr><th>Date</th><th>Items</th><th>Total (R)</th></tr>
+        </thead>
         <tbody id="report-list"></tbody>
     </table>
+
+    <div class="best-product" id="best-product"></div>
 </main>
 
 <script src="js/reports.js"></script>
+<script>
+// Sample JS logic to show filtering, CSV export, and best-selling product
+const sales = JSON.parse(localStorage.getItem('sales')) || [];
+const reportList = document.getElementById('report-list');
+const reportPeriod = document.getElementById('report-period');
+const bestProductEl = document.getElementById('best-product');
+
+function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    return `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
+}
+
+function renderReports() {
+    const period = reportPeriod.value;
+    reportList.innerHTML = '';
+    const filtered = sales.filter(s => {
+        const saleDate = new Date(s.date);
+        const today = new Date();
+        if (period==='daily') return saleDate.toDateString() === today.toDateString();
+        if (period==='monthly') return saleDate.getMonth()===today.getMonth() && saleDate.getFullYear()===today.getFullYear();
+        if (period==='yearly') return saleDate.getFullYear()===today.getFullYear();
+    });
+    const productCounts = {};
+    filtered.forEach(s => {
+        const itemsStr = s.items.map(i=>i.name+'(x'+i.qty+')').join(', ');
+        s.items.forEach(i=>{
+            productCounts[i.name] = (productCounts[i.name]||0)+i.qty;
+        });
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${formatDate(s.date)}</td><td>${itemsStr}</td><td>R${s.total.toFixed(2)}</td>`;
+        reportList.appendChild(tr);
+    });
+    // Best selling
+    let best = {name:'None', qty:0};
+    for(const [name, qty] of Object.entries(productCounts)){
+        if(qty>best.qty) best = {name, qty};
+    }
+    bestProductEl.textContent = `Best Selling Product: ${best.name} (${best.qty})`;
+}
+
+reportPeriod.addEventListener('change', renderReports);
+renderReports();
+
+// CSV Export
+document.getElementById('export-csv').addEventListener('click', ()=>{
+    let csv = 'Date,Items,Total(R)\\n';
+    const rows = reportList.querySelectorAll('tr');
+    rows.forEach(r=>{
+        const cols = Array.from(r.querySelectorAll('td')).map(c=>c.textContent);
+        csv += cols.join(',') + '\\n';
+    });
+    const blob = new Blob([csv], {type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'sales_report.csv';
+    a.click();
+});
+</script>
 </body>
 </html>
