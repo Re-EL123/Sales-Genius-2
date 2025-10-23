@@ -10,7 +10,7 @@ function renderProducts() {
     productButtons.innerHTML = '';
     products.forEach((p, i) => {
         const btn = document.createElement('button');
-        btn.textContent = `${p.name} ($${p.price})`;
+        btn.textContent = `${p.name} ($R{p.price})`;
         btn.onclick = () => addToCart(i);
         productButtons.appendChild(btn);
     });
