@@ -23,6 +23,7 @@ th, td { border:1px solid #ccc; padding:5px; text-align:center; }
     <h1>POS Sales</h1>
     <a href="dashboard.html" style="color:white; text-decoration:none; font-weight:bold;">Back</a>
 </header>
+
 <main>
     <div id="product-buttons"></div>
 
@@ -67,6 +68,7 @@ th, td { border:1px solid #ccc; padding:5px; text-align:center; }
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
@@ -82,35 +84,29 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
 
-// Redirect to index if not signed in
+// Redirect if not signed in
 auth.onAuthStateChanged(user => {
-  if (!user) {
-    window.location.href = "index.html";
-  }
+  if (!user) window.location.href = "index.html";
 });
 
-// Sample products for demo
-const products = [
-  { name: "Laptop", price: 12000 },
-  { name: "Mouse", price: 250 },
-  { name: "Keyboard", price: 400 },
-  { name: "Monitor", price: 3000 },
-  { name: "Printer", price: 2800 }
-];
-
+// Cart logic
 const cart = [];
-
 const productButtonsDiv = document.getElementById("product-buttons");
 const cartList = document.getElementById("cart-list");
 const totalEl = document.getElementById("total");
 
-// Display product buttons
-products.forEach(p => {
-  const btn = document.createElement("button");
-  btn.textContent = `${p.name} - R${p.price}`;
-  btn.onclick = () => addToCart(p);
-  productButtonsDiv.appendChild(btn);
+// Load products from Firestore
+db.collection("products").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+  productButtonsDiv.innerHTML = "";
+  snapshot.forEach(doc => {
+    const product = doc.data();
+    const btn = document.createElement("button");
+    btn.textContent = `${product.name} - R${product.price}`;
+    btn.onclick = () => addToCart(product);
+    productButtonsDiv.appendChild(btn);
+  });
 });
 
 function addToCart(product) {
@@ -127,14 +123,14 @@ function renderCart() {
   cartList.innerHTML = "";
   let total = 0;
   cart.forEach((item, index) => {
-    const row = document.createElement("tr");
     const totalPrice = item.price * item.qty;
     total += totalPrice;
+    const row = document.createElement("tr");
     row.innerHTML = `
       <td>${item.name}</td>
-      <td>${item.price}</td>
+      <td>R${item.price.toFixed(2)}</td>
       <td>${item.qty}</td>
-      <td>${totalPrice}</td>
+      <td>R${totalPrice.toFixed(2)}</td>
       <td><button onclick="removeFromCart(${index})">Remove</button></td>
     `;
     cartList.appendChild(row);
@@ -147,21 +143,19 @@ function removeFromCart(index) {
   renderCart();
 }
 
-// Checkout button
-document.getElementById("checkout-btn").addEventListener("click", () => {
-  if (cart.length === 0) {
-    alert("Cart is empty!");
-    return;
-  }
+// Checkout
+document.getElementById("checkout-btn").addEventListener("click", async () => {
+  if (cart.length === 0) return alert("Cart is empty!");
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-
   const email = document.getElementById("customer-email").value || "N/A";
   const whatsapp = document.getElementById("customer-whatsapp").value || "N/A";
   const payment = document.getElementById("payment-method").value;
   const customerType = document.getElementById("customer-type").value;
+  const totalAmount = totalEl.textContent;
 
+  // PDF Header
   let y = 20;
   doc.setFontSize(16);
   doc.text("Sales Genius - Receipt", 14, y);
@@ -169,7 +163,7 @@ document.getElementById("checkout-btn").addEventListener("click", () => {
   doc.text(`Customer Type: ${customerType}`, 14, y + 10);
   doc.text(`Email: ${email}`, 14, y + 16);
   doc.text(`WhatsApp: ${whatsapp}`, 14, y + 22);
-  doc.text(`Payment: ${payment}`, 14, y + 28);
+  doc.text(`Payment Method: ${payment}`, 14, y + 28);
   doc.text(`Date: ${new Date().toLocaleString()}`, 14, y + 34);
   y += 45;
 
@@ -184,10 +178,25 @@ document.getElementById("checkout-btn").addEventListener("click", () => {
 
   doc.setFontSize(14);
   y += 10;
-  doc.text(`Total: R${totalEl.textContent}`, 14, y);
+  doc.text(`Total: R${totalAmount}`, 14, y);
 
+  // Save receipt
   doc.save(`Receipt_${Date.now()}.pdf`);
-  alert("Receipt generated successfully!");
+
+  // Save sale record to Firestore
+  await db.collection("sales").add({
+    customerType,
+    email,
+    whatsapp,
+    payment,
+    totalAmount: parseFloat(totalAmount),
+    items: cart,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  alert("✅ Sale completed & receipt generated!");
+  cart.length = 0;
+  renderCart();
 });
 </script>
 </body>
