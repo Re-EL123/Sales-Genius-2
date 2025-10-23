@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POS Sales</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+    <h1>POS Sales</h1>
+    <a href="dashboard.html">Back</a>
+</header>
+<main>
+    <div id="product-buttons"></div>
+    <h2>Cart</h2>
+    <table>
+        <thead><tr><th>Name</th><th>Price</th><th>Qty</th><th>Total</th><th>Action</th></tr></thead>
+        <tbody id="cart-list"></tbody>
+    </table>
+    <h3>Total: $<span id="total">0</span></h3>
+    <button id="checkout-btn">Checkout</button>
+</main>
+
+<script src="js/sales.js"></script>
+</body>
+</html>

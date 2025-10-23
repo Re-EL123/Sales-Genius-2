@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POS Dashboard</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+<header>
+    <h1>POS Dashboard</h1>
+    <button id="logout-btn">Logout</button>
+</header>
+<main>
+    <div class="cards">
+        <a href="products.html" class="card">Manage Products</a>
+        <a href="sales.html" class="card">POS & Sales</a>
+        <a href="reports.html" class="card">Reports</a>
+    </div>
+</main>
+
+<script>
+const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+if (!currentUser) window.location.href = 'index.html';
+document.getElementById('logout-btn').addEventListener('click', () => {
+    localStorage.removeItem('currentUser');
+    window.location.href = 'index.html';
+});
+</script>
+</body>
+</html>
