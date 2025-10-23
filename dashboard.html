@@ -9,7 +9,7 @@
 <!-- Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-body { font-family: Arial, sans-serif; background:#e0f7ff; margin:0; padding:0; }
+body { font-family: Arial, sans-serif; background:#e0f7ff; margin:0; padding:0; transition: background 0.3s, color 0.3s; }
 header { background:#00bfff; color:white; padding:15px; display:flex; justify-content:space-between; align-items:center; }
 header h1 { margin:0; font-size:24px; }
 header button { padding:10px 20px; background:#009acd; border:none; border-radius:5px; color:white; cursor:pointer; transition:0.3s; }
@@ -31,6 +31,7 @@ header button:hover { background:#007bb5; transform:scale(1.05); }
     <h1>Sales Genius by Re-EL</h1>
     <button id="logout-btn">Logout</button>
 </header>
+
 <main>
     <div class="cards">
         <a href="products.html" class="card">
@@ -47,23 +48,68 @@ header button:hover { background:#007bb5; transform:scale(1.05); }
             <i class="fas fa-chart-line"></i>
             Reports
         </a>
+        <a href="settings.html" class="card">
+            <i class="fas fa-gear"></i>
+            Settings
+        </a>
     </div>
 </main>
 
-<script>
-const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-if (!currentUser) window.location.href = 'index.html';
+<script type="module">
+// -------------------- FIREBASE CONFIG --------------------
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-document.getElementById('logout-btn').addEventListener('click', () => {
-    localStorage.removeItem('currentUser');
-    window.location.href = 'index.html';
+const firebaseConfig = {
+  apiKey: "AIzaSyBLD-z9z2Le8DAqYobMkd2kwurgI9B69rY",
+  authDomain: "sales-genius-a.firebaseapp.com",
+  projectId: "sales-genius-a",
+  storageBucket: "sales-genius-a.firebasestorage.app",
+  messagingSenderId: "443916526137",
+  appId: "1:443916526137:web:87f76fa73b0a578b17a3e8",
+  measurementId: "G-M9C615D3J5"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// -------------------- AUTH CHECK --------------------
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    // Not logged in, redirect to index
+    window.location.href = "index.html";
+  } else {
+    loadDashboardData();
+  }
 });
 
-// Get totals
-const products = JSON.parse(localStorage.getItem('products')) || [];
-const sales = JSON.parse(localStorage.getItem('sales')) || [];
-document.getElementById('total-products').textContent = products.length;
-document.getElementById('total-sales').textContent = sales.length;
+// -------------------- LOGOUT --------------------
+document.getElementById('logout-btn').addEventListener('click', async () => {
+  try {
+    await signOut(auth);
+    localStorage.removeItem('currentUser');
+    window.location.href = 'index.html';
+  } catch (error) {
+    alert("Logout failed: " + error.message);
+  }
+});
+
+// -------------------- LOAD DASHBOARD DATA --------------------
+function loadDashboardData() {
+  const products = JSON.parse(localStorage.getItem('products')) || [];
+  const sales = JSON.parse(localStorage.getItem('sales')) || [];
+  document.getElementById('total-products').textContent = products.length;
+  document.getElementById('total-sales').textContent = sales.length;
+
+  // Apply user theme if saved
+  const savedTheme = localStorage.getItem('theme') || 'skyblue';
+  document.body.style.background =
+    savedTheme === 'skyblue' ? '#e0f7ff' :
+    savedTheme === 'light' ? '#f9f9f9' :
+    '#1a1a1a';
+  document.body.style.color = savedTheme === 'dark' ? 'white' : 'black';
+}
 </script>
 </body>
 </html>
